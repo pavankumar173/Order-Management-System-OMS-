@@ -2,31 +2,23 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { setAuthToken } from '../api'
 import { Snackbar, Alert } from '@mui/material'
 
-export type AuthState = { token: string, userId: number, username: string } | null
+// Plain JS auth context
+// auth: { token: string, userId: number, username: string } | null
+const AuthCtx = createContext(undefined)
 
-type Notify = (msg: string, severity?: 'success' | 'error' | 'info' | 'warning') => void
-
-type Ctx = {
-	auth: AuthState
-	setAuth: (v: AuthState) => void
-	notify: Notify
-}
-
-const AuthCtx = createContext<Ctx | undefined>(undefined)
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-	const [auth, setAuth] = useState<AuthState>(() => {
+export function AuthProvider({ children }) {
+	const [auth, setAuth] = useState(() => {
 		const saved = localStorage.getItem('auth')
-		return saved ? JSON.parse(saved) as AuthState : null
+		return saved ? JSON.parse(saved) : null
 	})
-	const [snack, setSnack] = useState<{ open: boolean, msg: string, severity: 'success'|'error'|'info'|'warning' }>({ open: false, msg: '', severity: 'info' })
+	const [snack, setSnack] = useState({ open: false, msg: '', severity: 'info' })
 
 	useEffect(() => {
 		localStorage.setItem('auth', JSON.stringify(auth))
 		setAuthToken(auth?.token ?? null)
 	}, [auth])
 
-	const notify: Notify = (msg, severity='info') => setSnack({ open: true, msg, severity })
+	const notify = (msg, severity = 'info') => setSnack({ open: true, msg, severity })
 
 	const value = useMemo(() => ({ auth, setAuth, notify }), [auth])
 
