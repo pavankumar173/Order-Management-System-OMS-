@@ -1,6 +1,5 @@
 package com.oms.controller;
 
-import com.oms.dto.AuthDtos.AuthResponse;
 import com.oms.dto.AuthDtos.LoginRequest;
 import com.oms.dto.AuthDtos.RegisterRequest;
 import com.oms.service.AuthService;
@@ -35,9 +34,10 @@ class AuthControllerTest {
 	@Test
 	void login_ok() throws Exception {
 		String body = "{\"username\":\"u1\",\"password\":\"secret123\"}";
-		Mockito.when(authService.login(new LoginRequest("u1","secret123"))).thenReturn("token123");
+		Mockito.when(authService.login(new LoginRequest("u1","secret123"))).thenReturn(new AuthService.LoginResult("token123", 1L));
 		mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON).content(body))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.token").value("token123"));
+				.andExpect(jsonPath("$.token").value("token123"))
+				.andExpect(jsonPath("$.userId").value(1));
 	}
 } 
