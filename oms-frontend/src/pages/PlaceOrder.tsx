@@ -1,20 +1,24 @@
 import { useState } from 'react'
 import { Box, Button, Container, TextField, Typography, Alert } from '@mui/material'
 import { createOrder } from '../api'
+import { useAuth } from '../context/AuthContext'
 
-export default function PlaceOrder({ userId }: { userId: number }) {
+export default function PlaceOrder() {
 	const [productName, setProductName] = useState('')
 	const [quantity, setQuantity] = useState<number>(1)
 	const [price, setPrice] = useState<number>(0)
 	const [msg, setMsg] = useState<string | null>(null)
 	const [err, setErr] = useState<string | null>(null)
+	const { auth, notify } = useAuth()
 
 	const onSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
+		if (!auth?.userId) return
 		setMsg(null); setErr(null)
 		try {
-			await createOrder({ userId, productName, quantity, price })
+			await createOrder({ userId: auth.userId, productName, quantity, price })
 			setMsg('Order placed successfully')
+			notify('Order placed successfully', 'success')
 		} catch (e: any) {
 			setErr(e?.response?.data?.message ?? 'Failed to place order')
 		}

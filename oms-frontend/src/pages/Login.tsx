@@ -1,18 +1,21 @@
 import { useState } from 'react'
 import { Box, Button, Container, TextField, Typography, Alert } from '@mui/material'
 import { login } from '../api'
+import { useAuth } from '../context/AuthContext'
 
-export default function Login({ onLogin }: { onLogin: (args: { token: string, username: string }) => void }) {
+export default function Login() {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const [err, setErr] = useState<string | null>(null)
+	const { setAuth, notify } = useAuth()
 
 	const onSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setErr(null)
 		try {
-			const token = await login(username, password)
-			onLogin({ token, username })
+			const { token, userId } = await login(username, password)
+			setAuth({ token, userId, username })
+			notify('Logged in', 'success')
 		} catch (e: any) {
 			setErr(e?.response?.data?.message ?? 'Login failed')
 		}

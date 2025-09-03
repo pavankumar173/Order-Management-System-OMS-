@@ -15,7 +15,8 @@ public class AuthDtos {
 	) {}
 
 	public record AuthResponse(
-			String token
+			String token,
+			Long userId
 	) {}
 
 	public record OrderCreateRequest(

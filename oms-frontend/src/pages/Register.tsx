@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { Box, Button, Container, TextField, Typography, Alert } from '@mui/material'
 import { register } from '../api'
+import { useAuth } from '../context/AuthContext'
 
 export default function Register() {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const [msg, setMsg] = useState<string | null>(null)
 	const [err, setErr] = useState<string | null>(null)
+	const { notify } = useAuth()
 
 	const onSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
@@ -14,6 +16,7 @@ export default function Register() {
 		try {
 			await register(username, password)
 			setMsg('Registered successfully')
+			notify('Registered successfully', 'success')
 		} catch (e: any) {
 			setErr(e?.response?.data?.message ?? 'Registration failed')
 		}

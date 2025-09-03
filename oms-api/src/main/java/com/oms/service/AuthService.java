@@ -35,7 +35,7 @@ public class AuthService {
 		return userRepository.save(user);
 	}
 
-	public String login(LoginRequest req) {
+	public LoginResult login(LoginRequest req) {
 		Optional<User> userOpt = userRepository.findByUsername(req.username());
 		User user = userOpt.orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
 		if (!passwordEncoder.matches(req.password(), user.getPasswordHash())) {
@@ -43,10 +43,12 @@ public class AuthService {
 		}
 		String token = UUID.randomUUID().toString();
 		tokenToUserId.put(token, user.getId());
-		return token;
+		return new LoginResult(token, user.getId());
 	}
 
 	public Optional<Long> resolveUserId(String token) {
 		return Optional.ofNullable(tokenToUserId.get(token));
 	}
+
+	public record LoginResult(String token, Long userId) {}
 } 
